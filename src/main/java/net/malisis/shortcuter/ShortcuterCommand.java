@@ -24,67 +24,41 @@
 
 package net.malisis.shortcuter;
 
-import io.netty.buffer.ByteBuf;
-import net.malisis.core.network.IMalisisMessageHandler;
-import net.malisis.core.network.MalisisMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.relauncher.Side;
+import net.malisis.core.registry.AutoLoad;
+import net.malisis.shortcuter.gui.ConfigGui;
+import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.client.ClientCommandHandler;
 
 /**
  * @author Ordinastie
  *
  */
-@MalisisMessage
-public class SwapMessage implements IMalisisMessageHandler<SwapMessage.Packet, IMessage>
+@AutoLoad(true)
+public class ShortcuterCommand extends CommandBase
 {
-
-	public SwapMessage()
+	public ShortcuterCommand()
 	{
-		Shortcuter.network.registerMessage(this, SwapMessage.Packet.class, Side.SERVER);
+		ClientCommandHandler.instance.registerCommand(this);
 	}
 
 	@Override
-	public void process(Packet message, MessageContext ctx)
+	public String getName()
 	{
-		Shortcut.swap(IMalisisMessageHandler.getPlayer(ctx), message.slot1, message.slot2);
+		return "shortcuter";
 	}
 
-	public static void swap(int slot1, int slot2)
+	@Override
+	public String getUsage(ICommandSender sender)
 	{
-		Shortcuter.network.sendToServer(new Packet(slot1, slot2));
+		return "shortcuter.command.usage";
 	}
 
-	/**
-	 * @author Ordinastie
-	 *
-	 */
-	public static class Packet implements IMessage
+	@Override
+	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
 	{
-		private int slot1;
-		private int slot2;
-
-		public Packet()
-		{}
-
-		public Packet(int slot1, int slot2)
-		{
-			this.slot1 = slot1;
-			this.slot2 = slot2;
-		}
-
-		@Override
-		public void fromBytes(ByteBuf buf)
-		{
-			slot1 = buf.readInt();
-			slot2 = buf.readInt();
-		}
-
-		@Override
-		public void toBytes(ByteBuf buf)
-		{
-			buf.writeInt(slot1);
-			buf.writeInt(slot2);
-		}
+		new ConfigGui().display(true);
 	}
 }

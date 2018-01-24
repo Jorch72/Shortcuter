@@ -30,6 +30,7 @@ import net.malisis.core.inventory.MalisisSlot;
 import net.malisis.core.inventory.player.PlayerInventory;
 import net.malisis.core.util.ItemUtils;
 import net.malisis.core.util.Utils;
+import net.malisis.shortcuter.network.SwapMessage;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
