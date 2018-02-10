@@ -31,7 +31,12 @@ import java.util.Locale;
 import com.google.common.collect.Lists;
 
 import net.malisis.core.client.gui.MalisisGui;
+import net.malisis.core.client.gui.component.container.UIContainer;
+import net.malisis.core.client.gui.component.container.UIListContainer;
+import net.malisis.core.client.gui.component.decoration.UILabel;
 import net.malisis.core.client.gui.component.interaction.UITextField;
+import net.malisis.core.client.gui.render.ColoredBackground;
+import net.malisis.core.renderer.font.FontOptions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ISearchTree;
 import net.minecraft.client.util.SearchTreeManager;
@@ -43,13 +48,35 @@ import net.minecraft.item.ItemStack;
  */
 public class SearchBox extends UITextField
 {
-	protected SearchResults resultContainer;
+	protected UIContainer<?> resultContainer;
+	protected UIListContainer<ItemStack> listContainer;
+	protected UILabel noresult;
 
 	public SearchBox(MalisisGui gui)
 	{
 		super(gui, false);
 
-		resultContainer = new SearchResults(gui, this);
+		resultContainer = new UIContainer<>(gui);
+		resultContainer.setBackground(new ColoredBackground(0xAAAAAA, 2, 0xFFFFFF));
+		resultContainer.setVisible(false);
+
+		noresult = new UILabel(gui, "shortcuter.gui.search.no_result");
+		noresult.setFontOptions(FontOptions.builder().color(0x999999).italic().build());
+
+		UIListContainer<ItemStack> listContainer;
+		listContainer = new UIListContainer<>(gui);
+		listContainer.setElementSpacing(1);
+		listContainer.setComponentFactory(SearchResult::new);
+
+		listContainer.add(listContainer);
+
+	}
+
+	@Override
+	public void onAddedToScreen()
+	{
+		super.onAddedToScreen();
+		getGui().addToScreen(resultContainer);
 	}
 
 	public void updateResults()
@@ -58,7 +85,7 @@ public class SearchBox extends UITextField
 
 		if (input.length() <= 0)
 		{
-			resultContainer.setElements(Collections.emptyList());
+			listContainer.setElements(Collections.emptyList());
 			hideResults();
 			return;
 		}
@@ -66,19 +93,22 @@ public class SearchBox extends UITextField
 		List<ItemStack> itemStacks = Lists.newArrayList();
 		ISearchTree<ItemStack> st = Minecraft.getMinecraft().getSearchTree(SearchTreeManager.ITEMS);
 		itemStacks.addAll(st.search(input.toLowerCase(Locale.ROOT)));
-		resultContainer.setElements(itemStacks);
+		listContainer.setElements(itemStacks);
+
+		noresult.setVisible(itemStacks.size() == 0);
 
 		showResults();
 	}
 
 	public void showResults()
 	{
-		resultContainer.display();
+		resultContainer.setPosition(screenX(), screenY() + getHeight());
+		resultContainer.setVisible(true);
 	}
 
 	public void hideResults()
 	{
-		resultContainer.hide();
+		resultContainer.setVisible(false);
 	}
 
 	@Override

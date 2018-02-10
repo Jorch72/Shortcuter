@@ -26,8 +26,8 @@ package net.malisis.shortcuter.gui;
 
 import net.malisis.core.client.gui.MalisisGui;
 import net.malisis.core.client.gui.component.container.UIContainer;
-import net.malisis.core.client.gui.component.container.UIWindow;
 import net.malisis.core.client.gui.component.decoration.UILabel;
+import net.malisis.core.client.gui.render.BackgroundTexture.WindowBackground;
 
 /**
  * @author Ordinastie
@@ -38,14 +38,15 @@ public class ConfigGui extends MalisisGui
 	@Override
 	public void construct()
 	{
-		UIWindow window = new UIWindow(this, 400, 300);
+		UIContainer<?> window = new UIContainer<>(this, 400, 300);
+		window.setBackground(new WindowBackground(this));
 
 		addSearch(window);
 
 		addToScreen(window);
 	}
 
-	private void addSearch(UIWindow window)
+	private void addSearch(UIContainer<?> window)
 	{
 		UIContainer<?> cont = new UIContainer<>(this);
 
